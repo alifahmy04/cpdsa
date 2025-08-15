@@ -1,0 +1,23 @@
+class union_find {
+public:
+    unordered_map<int, int> parent;
+    union_find(int n) : parent(n) {
+        for (int i = 0; i < n; i++) {
+            parent[i] = i;
+        }
+    }
+
+    int find(int x) {
+        if (parent[x] == x) {
+            return x;
+        }
+        parent[x] = find(parent[x]);
+        return parent[x];
+    }
+
+    void join(int x, int y) {
+        int px = find(x);
+        int py = find(y);
+        parent[py] = px;
+    }
+};

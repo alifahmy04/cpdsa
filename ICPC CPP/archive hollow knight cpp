@@ -1,0 +1,144 @@
+#include <iostream>
+#include <bits/stdc++.h>
+#include <ext/pb_ds/assoc_container.hpp>
+#include <sstream>
+#define nl '\n'
+#define ll long long
+using namespace std;
+
+struct triple {
+    int x;
+    int y;
+    int z;
+
+    triple() {};
+    triple(int x, int y, int z) : x(x), y(y), z(z) {};
+};
+
+std::ostream &operator<<(std::ostream &s, const pair<int, int> &t) {
+    s << "(" << t.first << ", " << t.second << ")";
+    return s;
+}
+
+std::ostream &operator<<(std::ostream &s, const triple &t) {
+    s << "(" << t.x << ", " << t.y << ", " << t.z << ")";
+    return s;
+}
+
+template <typename T>
+std::ostream &operator<<(std::ostream &s, const std::vector<T> &t) {
+    int last = t.size() - 1;
+    s << "[";
+    for (int i = 0; i < t.size(); i++)
+    {
+        s << t[i];
+        if (i != last)
+        {
+            s << ", ";
+        }
+    }
+    return s << "]";
+}
+
+template <typename T, typename K>
+std::ostream &operator<<(std::ostream &s, const pair<T, K> &t) {
+    s << "(" << t.first << ", " << t.second << ")";
+    return s;
+}
+
+string arrToString(int *arr, int size) {
+    std::ostringstream result;
+    result << "[";
+    for (int i = 0; i < size; ++i)
+    {
+        result << arr[i];
+        if (i != size - 1)
+        {
+            result << ", ";
+        }
+    }
+    result << "]";
+    return result.str();
+}
+
+int gcd(int a, int b) {
+    while (b)
+    {
+        a %= b;
+        swap(a, b);
+    }
+    return a;
+}
+
+struct node {
+    int val;
+    int left;
+    int right;
+    node(int val, int left = -1, int right = -1) : val(val), left(left), right(right) {}
+};
+
+
+
+vector<bool> sieve;
+vector<int> sieve_map;
+
+void tour() {
+
+}
+
+void initSieve(int N) {
+    sieve.resize(N + 1, true);
+    sieve_map.resize(N + 1, -1);
+    sieve[0] = sieve[1] = false;
+    for (int i = 2; i < N; i++) {
+        if (sieve[i]) {
+            for (int j = 2*i; j < N; j += i) {
+                sieve[j] = false;
+            }
+        }
+    }
+    int idx = 0;
+    for (int i = 1; i <= N; i++) {
+        if (sieve[i]) {
+            sieve_map[i] = idx++;
+        }
+    }
+}
+
+signed main() {
+    ios_base::sync_with_stdio(false);
+    // freopen("rmq.in", "r", stdin);
+    cout.tie(nullptr);
+    cin.tie(nullptr);
+    int n, q;
+    cin >> n >> q;
+    initSieve(n + 10);
+    vector<int> values(n);
+    for (int i = 0; i < n; i++) {
+        cin >> values[i];
+    }
+    vector<vector<int>> adj(n);
+    for (int i = 0; i < n - 1; i++) {
+        int parent, child;
+        cin >> parent >> child;
+        parent--; child--;
+        adj[parent].push_back(child);
+    }    
+    persistent_segment_tree pst(10000, n);
+    build_pst(adj, pst, values, 0, 0);
+    for (int i = 0; i < q; i++) {
+        int type, node;
+        cin >> type >> node;
+        if (type == 1) {
+            cout << pst.query(0, 9999, node - 1) << nl;
+        } else if (type == 2) {
+            int x;
+            cin >> x;
+            int prime_idx = sieve_map[x];
+            cout << pst.query(prime_idx, prime_idx, node - 1) << nl;
+        } else {
+            
+        }
+    }
+    vector<int> tour;
+} 

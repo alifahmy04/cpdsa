@@ -1,0 +1,36 @@
+    for (int i = 0; i < sa.states.size(); i++) {
+        cout << i << " -- ";
+        for (int j = 0; j < 26; j++) {
+            if (sa.states[i].next[j] != 0) {
+                cout << (char)(j + 'a') << ' ';
+                cout << sa.states[i].next[j] << ' ';
+            }
+        }
+        cout << " -- ";
+        cout << "len " << sa.states[i].len << " -- ";
+        cout << "link " << sa.states[i].link << " -- ";
+        cout << "dictionary " << sa.states[i].dictionaryLink << " -- ";
+        cout << sa.states[i].prefix << " -- ";
+        cout << sa.states[i].stringEnding << nl;
+    }
+
+    
+    // void buildDictionaryLinks() {
+    //     queue<int> q;
+    //     q.push(0);
+    //     while (!q.empty()) {
+    //         int current = q.front(); q.pop();
+    //         if (current != 0) {
+    //             if (!states[states[current].link].stringEnding.empty()) {
+    //                 states[current].dictionaryLink = states[current].link;
+    //             } else {
+    //                 states[current].dictionaryLink = states[states[current].link].dictionaryLink;
+    //             }
+    //         }
+    //         for (int i = 0; i < 26; i++) {
+    //             if (states[current].next[i] && states[current].len == states[states[current].next[i]].len - 1) {     
+    //                 q.push(states[current].next[i]);
+    //             }
+    //         }
+    //     }  
+    // }

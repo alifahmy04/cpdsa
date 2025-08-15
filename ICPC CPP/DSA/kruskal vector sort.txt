@@ -1,0 +1,24 @@
+void kruskal(vector<vector<pair<int, int>>>& adj, vector<vector<pair<int, int>>>& result) {
+    vector<triple> edges;
+    int count = 0;
+    union_find uf(adj.size());
+    for (int i = 0; i < adj.size(); i++) {
+        for (int j = 0; j < adj[i].size(); j++) {
+            if (adj[i][j].first > i) {
+                edges.emplace_back(triple(i, adj[i][j].first, adj[i][j].second));
+            }
+        }
+    }
+    sort(edges.begin(), edges.end(), [](triple& a, triple& b) {
+        return a.third < b.third;
+    });
+    for (int i = 0; i < edges.size(); i++) {
+        triple& edge = edges[i];
+        if (uf.find(edge.first) == uf.find(edge.second)) {
+            continue;
+        }
+        result[edge.first].emplace_back(pair(edge.second, edge.third));
+        result[edge.second].emplace_back(pair(edge.first, edge.third));
+        uf.join(edge.first, edge.second);
+    }
+}

@@ -1,0 +1,100 @@
+class PersistentSegmentTree {
+    struct Node {
+        int val;
+        Node* left;
+        Node* right;
+        Node(int val, Node* left = nullptr, Node* right = nullptr) : val(val), left(left), right(right) {}
+    };
+
+public:
+    int n;
+    vector<Node*> roots;
+
+public:
+    PersistentSegmentTree(const vector<int>& arr) : n(arr.size()) {
+        roots.push_back(build(arr, 0, n - 1));
+    }
+
+    int operation(int a, int b) {
+        return a + b;
+    }
+
+    Node* build(const vector<int>& arr, int l, int r) {
+        if (l == r) {
+            return new Node(arr[l]);
+        }
+        int mid = (l + r) >> 1;
+        Node* leftChild = build(arr, l, mid);
+        Node* rightChild = build(arr, mid + 1, r);
+        return new Node(operation(leftChild->val, rightChild->val), leftChild, rightChild);
+    }
+
+    void set(int index, int val, int ver = -1) {
+        if (ver == -1) ver = roots.size() - 1;
+        roots.push_back(update(roots[ver], val, 0, n - 1, index, true));
+    }
+
+    void add(int index, int val, int ver = -1) {
+        if (ver == -1) ver = roots.size() - 1;
+        roots.push_back(update(roots[ver], val, 0, n - 1, index, false));
+    }
+
+    Node* update(Node* current, int val, int currentl, int currentr, int index, bool set) {
+        if (currentl > index || currentr < index) {
+            return current;
+        }
+        if (currentl == currentr) {
+            int newVal = set ? val : current->val + val;
+            return new Node(newVal);
+        }
+        int mid = (currentl + currentr) >> 1;
+        Node* leftChild = update(current->left, val, currentl, mid, index, set);
+        Node* rightChild = update(current->right, val, mid + 1, currentr, index, set);
+        return new Node(operation(leftChild->val, rightChild->val), leftChild, rightChild);
+    }
+
+    int query(int l, int r, int ver) {
+        return query(roots[ver], 0, n - 1, l, r);
+    }
+
+    int query(Node* current, int currentl, int currentr, int l, int r) {
+        if (currentl >= l && currentr <= r) {
+            return current->val;
+        }
+        int mid = (currentl + currentr) >> 1;
+        if (mid >= r) return query(current->left, currentl, mid, l, r);
+        if (mid < l) return query(current->right, mid + 1, currentr, l, r);
+        return operation(query(current->left, currentl, mid, l, r), query(current->right, mid + 1, currentr, l, r));
+    }
+
+    void printTree(int ver, bool onlyLeaves) {
+        if (ver >= roots.size()) {
+            cout << "Version " << ver << " does not exist." << endl;
+            return;
+        }
+        queue<Node*> q;
+        q.push(roots[ver]);
+        while (!q.empty()) {
+            Node* current = q.front();
+            q.pop();
+
+            if (current == nullptr) {
+                continue;
+            }
+            if (!onlyLeaves || onlyLeaves && current->left == nullptr && current->right == nullptr) {
+                cout << current->val << " ";
+            } 
+            q.push(current->left);
+            q.push(current->right);
+        }
+        cout << "\n";
+    }
+
+    void printTree(int version) {
+        printTree(version, false);
+    }
+
+    void printLeaves(int version) {
+        printTree(version, true);
+    }
+};

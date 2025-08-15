@@ -1,0 +1,158 @@
+#include <iostream>
+#include <vector> 
+#include <string>
+#include <algorithm>
+#include <cmath>
+#include <cstdlib>
+#include <bits/stdc++.h>
+#include <ext/pb_ds/assoc_container.hpp>
+#include <queue>
+#include <unordered_set>
+#include <sstream>
+#include <cstdint>
+#include <unordered_map>
+#define nl '\n'
+#define ll long long
+#define COLOR_RESET "\033[0m"
+#define COLOR_BLUE "\033[34m"
+#define COLOR_GREEN "\033[32m"
+
+using namespace std;
+struct triple {
+    int x;
+    int y;
+    int z;
+
+    triple() {};
+    triple(int x, int y, int z) : x(x), y(y), z(z) {};
+};
+
+std::ostream& operator<<(std::ostream& s, const pair<int, int>& t) { 
+    s << "(" << t.first << ", " << t.second << ")";
+    return s;
+}
+
+std::ostream& operator<<(std::ostream& s, const triple& t) { 
+    s << "(" << t.x << ", " << t.y << ", " << t.z << ")";
+    return s;
+}
+
+
+template<typename T>
+std::ostream& operator<<(std::ostream& s, const std::vector<T>& t) { 
+    int last = t.size() - 1;
+    s << "[";
+    for (int i = 0; i < t.size(); i++) {
+        s << t[i];
+        if (i != last) {
+            s << ", ";
+        }
+    }
+    return s << "]";
+}
+
+string arrToString(int* arr, int size) {
+    std::ostringstream result;  
+    result << "[";              
+    for (int i = 0; i < size; ++i) {
+        result << arr[i];       
+        if (i != size - 1) {
+            result << ", ";   
+        }
+    }
+    result << "]";              
+    return result.str(); 
+}
+
+template<typename T>
+void shuffle_vector(std::vector<T>& arr) {
+    if (arr.size() <= 1) {
+        return;
+    }
+    std::mt19937 generator(static_cast<unsigned>(std::time(nullptr)));
+    std::uniform_int_distribution<int> int_distribution(0, arr.size() - 1);
+    for (int i = 0; i < 10000; i++) {
+        int random1 = int_distribution(generator);
+        int random2 = int_distribution(generator);
+        T temp = arr[random1];
+        arr[random1] = arr[random2];
+        arr[random2] = temp;
+    }
+}
+
+signed main() {
+    ios_base::sync_with_stdio(false);
+    cin.tie(nullptr);
+    cout.tie(nullptr);
+
+    int n;
+    cin >> n;
+    vector<int> nums(n);
+    for (int i = 0; i < n; i++) {
+        cin >> nums[i];
+    }
+
+    int q;
+    cin >> q;
+    vector<triple> queries;
+    for (int i = 0; i < q; i++) {
+        int l, r;
+        cin >> l >> r;
+        queries.emplace_back(triple(i, l - 1, r - 1));
+    }
+    
+    sort(queries.begin(), queries.end(), [n](const triple& a, const triple& b) -> bool {
+        if (a.y / sqrt(n) == b.y / sqrt(n)) {
+            return a.z < b.z;
+        }
+        return a.y < b.y;
+    });
+
+    int bIdx = 0;
+    int l = 0;
+    int r = 0;
+    int cnt = 0;
+    unordered_map<int, int> freq;
+    vector<int> result(q);
+    for (int& n : nums) {
+        freq[n] = 0;
+    }
+    for (int i = 0; i < q; i++) {
+        const triple& current = queries[i];
+        while (r != current.z + 1) {
+            if (r < current.z + 1) {
+                freq[nums[r]]++;
+                if (freq[nums[r]] == 1) {
+                    cnt++;
+                } 
+                r++;
+            } else {
+                r--;
+                freq[nums[r]++]--;
+                if (freq[nums[r]] == 0) {
+                    cnt--;
+                }
+            }
+        }
+        while (l != current.y) {
+            if (l < current.y) {
+                freq[nums[l]]--;
+                if (freq[nums[l]] == 0) {
+                    cnt--;
+                }
+                l++;
+            } else {
+                l--;
+                freq[nums[l]]++;
+                if (freq[nums[l]] == 1) {
+                    cnt++;
+                }
+            }
+        }
+        result[current.x] = cnt;
+    }
+
+    for (int i = 0; i < q; i++) {
+        cout << result[i] << nl;
+    }
+}
